@@ -6,6 +6,7 @@ clock = pygame.time.Clock()
 font = pygame.font.Font('items/Aleo-Bold.otf',50)
 
 class base:
+
     def __init__(self):
         self.base_src = pygame.transform.scale2x(pygame.image.load('items/base.png').convert())
         self.base_src_x_pos = 0
@@ -18,8 +19,8 @@ class base:
             self.base_src_x_pos = 0
 
 class pipe:
+
     def __init__(self):
-        self.creation_rect = None
         self.pipe_src = pygame.transform.scale2x(pygame.image.load('items/pipe.png').convert_alpha())
         self.pipe_list = []
         self.pipe_start = pygame.USEREVENT
@@ -57,6 +58,7 @@ class collision:
         return True
 
 class score:
+
     def __init__(self):
         self.score = 0
         self.high_score = 0
@@ -67,6 +69,7 @@ class score:
             score_surface = font.render(str(int(self.score)), True, (255, 211, 31))
             score_rect = score_surface.get_rect(center=(288, 100))
             screen.blit(score_surface, score_rect)
+
         if game_state == 'game_over':
             score_surface = font.render(f'Score: {int(self.score)}', True, (255, 211, 31))
             score_rect = score_surface.get_rect(center=(288, 100))
@@ -92,6 +95,7 @@ class score:
         return high_score
 
 class creation:
+
     def __init__(self):
         self.gravity = 0.25
         self.creation_move = 0
@@ -120,8 +124,8 @@ collision1 = collision()
 score1 = score()
 creation1 = creation()
 
-
 while True:
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -134,7 +138,7 @@ while True:
             if event.key == pygame.K_UP and creation1.main_game == False:
                 creation1.main_game = True
                 pipe1.pipe_list.clear()
-                pipe1.creation_rect.center =(100,512)
+                creation1.creation_rect.center =(100,512)
                 creation1.creation_move=0
                 score1.score = 0
         if event.type == pipe1.pipe_start:
@@ -154,11 +158,11 @@ while True:
         pipe1.add_pipe(pipe1.pipe_list)
         score1.pipe_score()
         score1.score_display('main_game')
+
     else:
         screen.blit(game_over_src,game_over_rect)
         score1.high_score=score1.update_score(score1.score,score1.high_score)
         score1.score_display('game_over')
-
 
     base1.draw()
     pygame.display.update()
