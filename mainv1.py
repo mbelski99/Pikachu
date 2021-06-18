@@ -1,10 +1,5 @@
 import pygame, sys, random
 
-pygame.init()
-screen = pygame.display.set_mode((576,1024))
-clock = pygame.time.Clock()
-font = pygame.font.Font('items/Aleo-Bold.otf',50)
-
 class base:
 
     def __init__(self):
@@ -46,14 +41,27 @@ class pipe:
                 rotate_pipe = pygame.transform.flip(self.pipe_src, False, True)
                 screen.blit(rotate_pipe, pipe)
 
+class pikachu:
+
+    def __init__(self):
+        self.gravity = 0.25
+        self.pikachu_move = 0
+        self.main_game = True
+        self.pikachu_src = pygame.transform.scale2x(pygame.image.load('items/pikachu.png').convert_alpha())
+        self.pikachu_rect = self.pikachu_src.get_rect(center=(100, 512))
+
+    def pikachu_r(self,pikachu):
+        new_pikachu = pygame.transform.rotozoom(pikachu, -self.pikachu_move * 3, 1)
+        return new_pikachu
 class collision:
 
     def check_collision(self,x):
         for pipe in x:
-            if creation1.creation_rect.colliderect(pipe):
+            if pikachu1.pikachu_rect.colliderect(pipe):
                 death_sound.play()
                 return False
-        if creation1.creation_rect.top <= -100 or creation1.creation_rect.bottom >= 900:
+        if pikachu1.pikachu_rect.top <= -100 or pikachu1.pikachu_rect.bottom >= 900:
+            death_sound.play()
             return False
         return True
 
@@ -94,23 +102,12 @@ class score:
             high_score = score
         return high_score
 
-class creation:
-
-    def __init__(self):
-        self.gravity = 0.25
-        self.creation_move = 0
-        self.main_game = True
-        self.creation_src = pygame.transform.scale2x(pygame.image.load('items/pikachu-midflap.png').convert_alpha())
-        self.creation_rect = self.creation_src.get_rect(center=(100, 512))
-
-    def creation_r(self,creation):
-        new_creation = pygame.transform.rotozoom(creation, -self.creation_move * 3, 1)
-        return new_creation
-
+pygame.init()
+screen = pygame.display.set_mode((576,1024))
+clock = pygame.time.Clock()
+font = pygame.font.Font('items/Aleo-Bold.otf',50)
 
 bg_src = pygame.transform.scale2x(pygame.image.load('items/bg.png').convert())
-
-
 game_over_src = pygame.transform.scale2x(pygame.image.load('items/text.png').convert_alpha())
 game_over_rect = game_over_src.get_rect(center = (288,512))
 
@@ -122,37 +119,35 @@ base1 = base()
 pipe1 = pipe()
 collision1 = collision()
 score1 = score()
-creation1 = creation()
+pikachu1 = pikachu()
 
 while True:
+    screen.blit(bg_src, (0, 0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and creation1.main_game:
-                creation1.creation_move = 0
-                creation1.creation_move -= 12
+            if event.key == pygame.K_UP and pikachu1.main_game:
+                pikachu1.pikachu_move = 0
+                pikachu1.pikachu_move -= 12
                 flap_sound.play()
-            if event.key == pygame.K_UP and creation1.main_game == False:
-                creation1.main_game = True
+            if event.key == pygame.K_UP and pikachu1.main_game == False:
+                pikachu1.main_game = True
                 pipe1.pipe_list.clear()
-                creation1.creation_rect.center =(100,512)
-                creation1.creation_move=0
+                pikachu1.pikachu_rect.center =(100,512)
+                pikachu1.pikachu_move=0
                 score1.score = 0
         if event.type == pipe1.pipe_start:
             pipe1.pipe_list.extend(pipe1.create_pipe())
 
-    screen.blit(bg_src,(0,0))
-
-    if creation1.main_game:
-
-        creation1.creation_move += creation1.gravity
-        creation_rotate = creation1.creation_r(creation1.creation_src)
-        creation1.creation_rect.centery += creation1.creation_move
-        screen.blit(creation_rotate,creation1.creation_rect)
-        creation1.main_game = collision1.check_collision(pipe1.pipe_list)
+    if pikachu1.main_game:
+        pikachu1.pikachu_move += pikachu1.gravity
+        pikachu_rotate = pikachu1.pikachu_r(pikachu1.pikachu_src)
+        pikachu1.pikachu_rect.centery += pikachu1.pikachu_move
+        screen.blit(pikachu_rotate,pikachu1.pikachu_rect)
+        pikachu1.main_game = collision1.check_collision(pipe1.pipe_list)
 
         pipe1.pipe_list = pipe1.move_pipe(pipe1.pipe_list)
         pipe1.add_pipe(pipe1.pipe_list)
@@ -160,6 +155,7 @@ while True:
         score1.score_display('main_game')
 
     else:
+
         screen.blit(game_over_src,game_over_rect)
         score1.high_score=score1.update_score(score1.score,score1.high_score)
         score1.score_display('game_over')
