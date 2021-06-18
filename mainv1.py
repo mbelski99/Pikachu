@@ -155,7 +155,6 @@ while True:
         score1.score_display('main_game')
 
     else:
-
         screen.blit(game_over_src,game_over_rect)
         score1.high_score=score1.update_score(score1.score,score1.high_score)
         score1.score_display('game_over')
